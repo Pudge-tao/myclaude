@@ -285,6 +285,12 @@ def op_run_command(op: Dict[str, Any], ctx: Dict[str, Any]) -> None:
         env[key] = value.replace("${install_dir}", str(ctx["install_dir"]))
 
     command = op.get("command", "")
+
+    # Platform detection: Use PowerShell script on Windows, bash script on others
+    if command.strip() == "bash install.sh":
+        if sys.platform == "win32":
+            command = "powershell -ExecutionPolicy Bypass -File install.ps1"
+
     result = subprocess.run(
         command,
         shell=True,
